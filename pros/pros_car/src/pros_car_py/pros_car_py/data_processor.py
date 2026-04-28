@@ -161,7 +161,7 @@ class DataProcessor:
         distance_to_goal = math.sqrt((last_x - goal_x) ** 2 + (last_y - goal_y) ** 2)
 
         # 如果該條路徑的末端有靠近終點就當成是成功的路徑
-        if distance_to_goal < 0.2:
+        if distance_to_goal < 0.5:
             self.ros_communicator.publish_confirmed_initial_plan(
                 received_global_plan_msg
             )
