@@ -281,6 +281,7 @@ class RosCommunicator(Node):
 
     # received_global_plan callback and get_latest_received_global_plan
     def received_global_plan_callback(self, msg):
+        print(f"[DEBUG] /plan received: {len(msg.poses)} poses")
         self.latest_received_global_plan = msg
 
     def get_latest_received_global_plan(self):

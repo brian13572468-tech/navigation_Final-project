@@ -159,6 +159,7 @@ class DataProcessor:
         goal_x, goal_y = goal_position[:2]
 
         distance_to_goal = math.sqrt((last_x - goal_x) ** 2 + (last_y - goal_y) ** 2)
+        print(f"[DEBUG] plan last point: ({last_x:.3f}, {last_y:.3f}), goal: ({goal_x:.3f}, {goal_y:.3f}), distance: {distance_to_goal:.3f}")
 
         # 如果該條路徑的末端有靠近終點就當成是成功的路徑
         if distance_to_goal < 0.5:
