@@ -45,7 +45,7 @@ class RosCommunicator(Node):
         # subscribe global_plan
         self.latest_received_global_plan = None
         self.subscriber_received_global_plan = self.create_subscription(
-            Path, "/received_global_plan", self.received_global_plan_callback, 1
+            Path, "/plan", self.received_global_plan_callback, 1
         )
 
         # Subscribe to YOLO detected object coordinates
