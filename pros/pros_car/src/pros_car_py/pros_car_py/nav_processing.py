@@ -81,14 +81,13 @@ class Nav2Processing:
 
         # 只抓第一次路径
         if self.recordFlag == 0:
-            if not self.check_data_availability():
+            global_plan = self.data_processor.get_processed_received_global_plan_no_dynamic()
+            if not global_plan or not self.data_processor.get_processed_amcl_pose()[0] or not self.ros_communicator.get_latest_goal():
                 return "STOP"
             else:
                 print("Get first path")
                 self.index = 0
-                self.global_plan_msg = (
-                    self.data_processor.get_processed_received_global_plan_no_dynamic()
-                )
+                self.global_plan_msg = global_plan
                 self.recordFlag = 1
                 action_key = "STOP"
 
