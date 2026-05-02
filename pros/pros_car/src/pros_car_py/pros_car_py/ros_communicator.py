@@ -312,6 +312,25 @@ class RosCommunicator(Node):
             msg.data = [float(velocities[2]), float(velocities[3])]
             self.publisher_forward.publish(msg)
 
+    def publish_wheel_speeds_from_twist(self, linear_x, angular_z):
+        """
+        差速驅動運動學：將線速度/角速度轉換成左右輪速並發布。
+        wheel_distance = 0.5 m, speed_scale = 1000 (m/s → 輪子命令值)
+        """
+        wheel_distance = 0.5
+        speed_scale = 1000.0
+
+        v_left = linear_x - (wheel_distance / 2.0) * angular_z
+        v_right = linear_x + (wheel_distance / 2.0) * angular_z
+
+        cmd_left = max(-300.0, min(300.0, v_left * speed_scale))
+        cmd_right = max(-300.0, min(300.0, v_right * speed_scale))
+
+        msg = Float32MultiArray()
+        msg.data = [cmd_left, cmd_right]
+        self.publisher_rear.publish(msg)
+        self.publisher_forward.publish(msg)
+
     def publish_car_control(self, action_key, publish_rear=True, publish_front=True):
         msg = Float32MultiArray()
         if action_key not in ACTION_MAPPINGS:

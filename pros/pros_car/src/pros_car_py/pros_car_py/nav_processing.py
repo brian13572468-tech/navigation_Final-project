@@ -101,6 +101,7 @@ class Nav2Processing:
 
         if target_x is None or target_distance < 0.5:
             self.ros_communicator.reset_nav2()
+            self.ros_communicator.publish_wheel_speeds_from_twist(0.0, 0.0)
             self.finish_nav_process()
             return "STOP"
 
@@ -108,12 +109,29 @@ class Nav2Processing:
         diff_angle = self.calculate_diff_angle(
             car_position, car_orientation, target_x, target_y
         )
+
+        max_linear = 0.3    # m/s 最大前進速度
+        max_angular = 1.0   # rad/s 最大旋轉速度
+
         if diff_angle < 20 and diff_angle > -20:
             action_key = "FORWARD"
+            linear_x = max_linear
+            # 前進時加小量比例角度修正 (diff_angle 單位:度 → 轉成 rad/s)
+            angular_z = math.radians(diff_angle) * 0.5
         elif diff_angle < -20 and diff_angle > -180:
             action_key = "CLOCKWISE_ROTATION"
+            linear_x = 0.0
+            angular_z = -max_angular
         elif diff_angle > 20 and diff_angle < 180:
             action_key = "COUNTERCLOCKWISE_ROTATION"
+            linear_x = 0.0
+            angular_z = max_angular
+        else:
+            action_key = "STOP"
+            linear_x = 0.0
+            angular_z = 0.0
+
+        self.ros_communicator.publish_wheel_speeds_from_twist(linear_x, angular_z)
         return action_key
 
     def check_data_availability(self):

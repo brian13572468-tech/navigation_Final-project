@@ -156,8 +156,6 @@ class CarController:
                     self.nav_processing.reset_nav_process()
                     self.target_idx = (self.target_idx + 1) % len(self.target_list)
                     continue
-            # 發布控制指令
-
             elif mode == "custom_nav":
                 action_key = self.nav_processing.camera_nav()
 
@@ -165,9 +163,17 @@ class CarController:
                 action_key = "STOP"
             print(action_key)
             time.sleep(0.05)
-            self.ros_communicator.publish_car_control(
-                action_key, publish_rear=True, publish_front=True
-            )
+
+            # manual_auto_nav / target_auto_nav 已由 nav_processing 用差速驅動直接發布輪速
+            # custom_nav 仍使用固定速度表
+            if mode == "custom_nav":
+                self.ros_communicator.publish_car_control(
+                    action_key, publish_rear=True, publish_front=True
+                )
+            elif action_key == "STOP" and not self._thread_running:
+                self.ros_communicator.publish_car_control(
+                    "STOP", publish_rear=True, publish_front=True
+                )
         
         # 收尾動作
         print("[background_task] Navigation stopped.")
